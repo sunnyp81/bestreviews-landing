@@ -1,42 +1,50 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #F4F2EF;
-  --color-accent: #1652F0;
-  --color-background: #FFFFFF;
-  --color-supporting: #111827;
-  --color-off-white: #F4F2EF;
-  --color-signal-blue: #1652F0;
-  --color-pure-white: #FFFFFF;
-  --color-charcoal: #111827;
-
-  --font-sans: "Space Grotesk", sans-serif;
-  --font-drama: "DM Serif Display", serif;
-  --font-data: "Space Mono", monospace;
+  --color-primary: #5B7083;
+  --color-accent: #D99C4B;
+  --color-background: #F9F9F9;
+  --color-dark: #1F2224;
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
 }
 
 @layer base {
-  :root {
-    --bg-color: #FFFFFF;
-    --text-color: #111827;
-  }
-  
   body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: var(--font-sans);
-    @apply selection:bg-accent selection:text-white;
+    @apply bg-background text-dark font-body antialiased selection:bg-accent/30;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
   }
 }
 
-@layer utilities {
-  .noise-overlay {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.04;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
-  }
+/* Global Noise Overlay */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+.shadow-soft {
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05);
+}
+
+.shadow-soft-hover {
+  box-shadow: 0 30px 60px -12px rgba(0,0,0,0.08);
 }

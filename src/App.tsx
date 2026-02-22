@@ -2,437 +2,571 @@ import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
-  Check, Star, ArrowRight, Search, Menu, X, Activity, ShieldCheck, MessageSquare, 
-  BarChart3, Users, FileText, ChevronRight 
+  Search, 
+  Menu, 
+  X, 
+  ArrowRight, 
+  CheckCircle2, 
+  ShieldCheck, 
+  Database, 
+  Filter, 
+  FileText,
+  MessageSquare,
+  Sparkles,
+  BarChart3,
+  Quote
 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const App = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+// --- Components ---
+
+const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const navRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // GSAP Context
-  const mainRef = useRef(null);
+  return (
+    <nav 
+      ref={navRef}
+      className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 w-[90%] max-w-5xl rounded-full border border-white/10 ${
+        isScrolled ? 'bg-background/80 backdrop-blur-xl py-3 px-6 shadow-soft' : 'bg-transparent py-5 px-8'
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="font-heading font-bold text-xl tracking-tighter text-primary">BestReviews<span className="text-accent">.co.uk</span></span>
+        </div>
+        
+        <div className="hidden md:flex items-center gap-8">
+          {['Home', 'Garden', 'How We Review'].map((item) => (
+            <a key={item} href="#" className="text-sm font-medium hover:text-accent transition-colors duration-300">{item}</a>
+          ))}
+        </div>
+
+        <button className="bg-accent text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300 ease-out">
+          Latest Summaries
+        </button>
+      </div>
+    </nav>
+  );
+};
+
+const Hero = () => {
+  const heroRef = useRef(null);
+  const contentRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hero Animations
-      gsap.from('.hero-text', {
+      gsap.from('.hero-reveal', {
         y: 30,
         opacity: 0,
-        duration: 1,
-        stagger: 0.1,
+        duration: 1.2,
+        stagger: 0.15,
         ease: 'power2.out',
-        delay: 0.2
       });
+    }, heroRef);
+    return () => ctx.revert();
+  }, []);
 
-      gsap.from('.hero-chip', {
-        y: 20,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: 'power2.out',
-        delay: 0.6
-      });
+  return (
+    <section ref={heroRef} className="relative h-[95vh] flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=2000" 
+          alt="Modern Outdoor Living"
+          className="w-full h-full object-cover grayscale-[20%]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-dark/60 via-dark/40 to-background"></div>
+      </div>
 
-      // Philosophy Parallax & Text Reveal
-      gsap.from('.philosophy-text', {
-        scrollTrigger: {
-          trigger: '.philosophy-section',
-          start: 'top 70%',
-        },
-        y: 40,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.2,
-        ease: 'power2.out'
-      });
+      <div ref={contentRef} className="relative z-10 container mx-auto px-6 text-center max-w-4xl">
+        <div className="hero-reveal inline-block mb-6 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-sm font-medium">
+          The Real Truth About All-Season Furniture
+        </div>
+        <h1 className="hero-reveal text-5xl md:text-7xl font-heading font-bold text-white mb-8 leading-[1.1]">
+          <span className="font-light italic opacity-90 block text-3xl md:text-4xl mb-2">Cut through the noise on</span>
+          All-Season Furniture.
+        </h1>
+        <p className="hero-reveal text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed text-balance">
+          We analyzed 10,000+ real user conversations from forums, Reddit, and verified buyers so you don't have to.
+        </p>
 
-      // Feature Cards
+        <div className="hero-reveal relative max-w-xl mx-auto group">
+          <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+            <Search className="w-5 h-5 text-dark/40" />
+          </div>
+          <input 
+            type="text" 
+            placeholder="What are you looking to buy?"
+            className="w-full bg-white border-none py-5 pl-14 pr-6 rounded-2xl shadow-soft text-dark focus:ring-2 focus:ring-accent transition-all duration-300"
+            disabled
+          />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Features = () => {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
       gsap.from('.feature-card', {
         scrollTrigger: {
-          trigger: '.features-section',
+          trigger: containerRef.current,
           start: 'top 80%',
         },
         y: 40,
         opacity: 0,
         duration: 0.8,
-        stagger: 0.15,
-        ease: 'power2.out'
-      });
-      
-      // Chart Animation
-      gsap.to('.chart-bar-fill', {
-        scrollTrigger: {
-          trigger: '.features-section',
-          start: 'top 60%',
-        },
-        width: (index, target) => target.dataset.width,
-        duration: 1.5,
+        stagger: 0.2,
         ease: 'power2.out',
-        stagger: 0.2
       });
-
-      // How It Works Sticky Cards
-      const cards = gsap.utils.toArray('.process-card');
-      cards.forEach((card: any, i) => {
-        ScrollTrigger.create({
-          trigger: card,
-          start: 'top top',
-          pin: true,
-          pinSpacing: false,
-          end: 'bottom top',
-          onEnter: () => {
-            if (i > 0) {
-               gsap.to(cards[i - 1], { scale: 0.9, opacity: 0.5, filter: 'blur(20px)', duration: 0.5 });
-            }
-          },
-          onLeaveBack: () => {
-            if (i > 0) {
-               gsap.to(cards[i - 1], { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.5 });
-            }
-          }
-        });
-      });
-
-    }, mainRef);
-
+    }, containerRef);
     return () => ctx.revert();
   }, []);
 
   return (
-    <div ref={mainRef} className="bg-background text-supporting font-sans selection:bg-accent selection:text-white min-h-screen relative overflow-x-hidden">
-      {/* Noise Overlay */}
-      <div className="noise-overlay" />
-
-      {/* Navbar */}
-      <nav className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl transition-all duration-300 rounded-full px-6 py-3 flex items-center justify-between ${scrolled ? 'bg-white/80 backdrop-blur-xl border border-gray-100 shadow-sm' : 'bg-transparent text-white'}`}>
-        <div className={`font-bold text-lg tracking-tight ${scrolled ? 'text-supporting' : 'text-white'}`}>
-          bestreviews.co.uk
-        </div>
-        
-        <div className="hidden md:flex items-center gap-8">
-          {['Household', 'Garden', 'Tech', 'About'].map((link) => (
-            <a key={link} href={`#${link.toLowerCase()}`} className={`text-sm font-medium hover:-translate-y-[1px] transition-transform ${scrolled ? 'text-supporting/80 hover:text-accent' : 'text-white/90 hover:text-white'}`}>
-              {link}
-            </a>
-          ))}
-        </div>
-
-        <button className="bg-accent text-white px-5 py-2 rounded-full text-sm font-medium hover:scale-105 transition-transform shadow-lg shadow-accent/20">
-          Find a Product
-        </button>
-
-        <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          {isMenuOpen ? <X /> : <Menu className={scrolled ? 'text-supporting' : 'text-white'} />}
-        </button>
-      </nav>
-
-      {/* Mobile Menu Overlay */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 bg-background z-40 flex flex-col items-center justify-center gap-6 md:hidden">
-          {['Household', 'Garden', 'Tech', 'About'].map((link) => (
-            <a key={link} href={`#${link.toLowerCase()}`} className="text-2xl font-drama italic text-supporting" onClick={() => setIsMenuOpen(false)}>
-              {link}
-            </a>
-          ))}
-        </div>
-      )}
-
-      {/* Hero Section */}
-      <section className="relative h-[100dvh] w-full flex items-end pb-20 px-6 md:px-12 overflow-hidden">
-        {/* Background Image & Gradient */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80" 
-            alt="Data Analysis" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-supporting via-supporting/60 to-transparent" />
-        </div>
-
-        <div className="relative z-10 w-full max-w-4xl text-white">
-          {/* Social Proof Strip */}
-          <div className="flex flex-wrap gap-3 mb-6">
-            {['No sponsored rankings', 'Sourced from real owners', 'Updated monthly'].map((signal, i) => (
-              <div key={i} className="hero-chip flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-xs font-data uppercase tracking-wider">
-                <Check className="w-3 h-3 text-accent" />
-                {signal}
-              </div>
-            ))}
+    <section ref={containerRef} className="py-24 container mx-auto px-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Card 1: Sentiment Shuffler */}
+        <div className="feature-card bg-white p-8 rounded-[2rem] shadow-soft border border-black/5 flex flex-col h-[450px]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-primary/10 rounded-2xl text-primary">
+              <MessageSquare className="w-6 h-6" />
+            </div>
+            <h3 className="font-heading font-bold text-xl">The Sentiment Shuffler</h3>
           </div>
-
-          <h1 className="hero-text text-5xl md:text-7xl lg:text-8xl leading-[0.9] mb-6 font-bold tracking-tight">
-            The verdict from <br />
-            <span className="font-drama italic text-accent/90">10,000+ real conversations.</span>
-          </h1>
-
-          <p className="hero-text text-lg md:text-xl text-white/80 max-w-xl mb-8 font-light">
-            All household and some garden reviews you can actually trust.
-          </p>
-
-          <button className="hero-text bg-accent text-white px-8 py-4 rounded-full text-lg font-medium hover:scale-105 transition-transform shadow-xl shadow-accent/30 flex items-center gap-2 group">
-            See the top pics
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="features-section py-24 px-6 md:px-12 bg-background">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-          
-          {/* Card 1: Source Aggregator */}
-          <div className="feature-card bg-primary p-8 rounded-4xl shadow-sm hover:translate-y-[-4px] hover:shadow-md transition-all border border-gray-100 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Users className="w-24 h-24 text-supporting" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">Source Aggregator</h3>
-            <p className="text-sm text-supporting/70 mb-8 font-data">No sponsored rankings</p>
-            
-            <div className="h-40 bg-white rounded-2xl border border-gray-100 p-4 flex items-center justify-center relative">
-              {/* Animated Nodes */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center z-10 shadow-lg shadow-accent/30">
-                  <ShieldCheck className="w-6 h-6 text-white" />
-                </div>
-                {/* Connecting Lines */}
-                {[0, 72, 144, 216, 288].map((deg, i) => (
-                  <div key={i} className="absolute w-full h-full flex items-center justify-center animate-pulse-slow" style={{ animationDelay: `${i * 0.5}s`, transform: `rotate(${deg}deg)` }}>
-                    <div className="w-[120px] h-[1px] bg-gradient-to-r from-accent to-transparent origin-left absolute left-1/2 top-1/2 -translate-y-1/2" />
-                    <div className="absolute right-4 w-2 h-2 bg-supporting rounded-full translate-x-[60px]" />
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="flex-1 relative overflow-hidden">
+             <SentimentShuffler />
           </div>
-
-          {/* Card 2: Verdict Typewriter */}
-          <div className="feature-card bg-primary p-8 rounded-4xl shadow-sm hover:translate-y-[-4px] hover:shadow-md transition-all border border-gray-100 relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-              <MessageSquare className="w-24 h-24 text-supporting" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">Real Owner Verdicts</h3>
-            <div className="flex items-center gap-2 mb-8">
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-              <p className="text-xs font-data uppercase text-red-500 tracking-wider">Live Feed</p>
-            </div>
-            
-            <div className="h-40 bg-supporting rounded-2xl border border-gray-800 p-6 font-data text-xs text-green-400 overflow-hidden leading-relaxed">
-              &gt; Analyzing 500+ threads...<br/>
-              &gt; "Best suction on carpet"<br/>
-              &gt; "Battery lasts 45 mins"<br/>
-              &gt; "Filter is hard to clean"<br/>
-              &gt; Consensus: <span className="text-white bg-green-600/30 px-1">HIGHLY RECOMMENDED</span><span className="animate-pulse">_</span>
-            </div>
-          </div>
-
-          {/* Card 3: Score Breakdown */}
-          <div className="feature-card bg-primary p-8 rounded-4xl shadow-sm hover:translate-y-[-4px] hover:shadow-md transition-all border border-gray-100 relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-              <BarChart3 className="w-24 h-24 text-supporting" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">Trust Score</h3>
-            <p className="text-sm text-supporting/70 mb-8 font-data">Updated Monthly</p>
-            
-            <div className="space-y-3">
-              {[
-                { label: 'Reliability', score: '9.2', width: '92%' },
-                { label: 'Value', score: '8.8', width: '88%' },
-                { label: 'Satisfaction', score: '9.5', width: '95%' },
-              ].map((item, i) => (
-                <div key={i}>
-                  <div className="flex justify-between text-xs font-bold mb-1">
-                    <span>{item.label}</span>
-                    <span className="font-data">{item.score}</span>
-                  </div>
-                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="chart-bar-fill h-full bg-accent rounded-full w-0" 
-                      data-width={item.width} 
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Philosophy Section */}
-      <section className="philosophy-section py-32 px-6 md:px-12 bg-supporting text-white relative overflow-hidden">
-        {/* Parallax Texture */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-fixed" />
-        
-        <div className="max-w-5xl mx-auto text-center relative z-10 space-y-8">
-          <p className="philosophy-text text-xl md:text-2xl text-white/40 font-light">
-            Most review sites rank what pays them most.
-          </p>
-          <h2 className="philosophy-text text-4xl md:text-6xl lg:text-7xl font-drama italic leading-tight">
-            We rank what owners <br />
-            <span className="text-accent">actually recommend.</span>
-          </h2>
-        </div>
-      </section>
-
-      {/* How It Works - Sticky Cards */}
-      <section className="py-24 px-6 md:px-12 bg-background">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl font-bold mb-16 text-center">Our Methodology</h2>
-          
-          {/* Step 1: We Listen */}
-          <div className="process-card h-[90vh] sticky top-0 bg-primary border border-gray-200 rounded-5xl p-8 md:p-16 mb-12 flex flex-col md:flex-row items-center gap-12 shadow-xl">
-            <div className="flex-1 space-y-6">
-              <span className="font-data text-accent text-lg">01.</span>
-              <h3 className="text-4xl md:text-5xl font-bold">We Listen</h3>
-              <p className="text-lg text-supporting/70 leading-relaxed">
-                We scour thousands of forum discussions, Reddit threads, and owner groups to find raw, unfiltered feedback.
-              </p>
-            </div>
-            <div className="flex-1 w-full aspect-square bg-white rounded-3xl border border-gray-100 relative overflow-hidden flex items-center justify-center">
-              {/* Laser Scan Animation */}
-              <div className="w-3/4 h-3/4 grid grid-cols-6 gap-2 opacity-30">
-                {Array.from({ length: 36 }).map((_, i) => (
-                  <div key={i} className="bg-gray-200 rounded-full w-full h-full" />
-                ))}
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/20 to-transparent h-8 w-full top-1/2 -translate-y-1/2 animate-[scan_2s_linear_infinite]" />
-              <style>{`
-                @keyframes scan {
-                  0% { top: 0%; }
-                  100% { top: 100%; }
-                }
-              `}</style>
-            </div>
-          </div>
-
-          {/* Step 2: We Analyse */}
-          <div className="process-card h-[90vh] sticky top-0 bg-primary border border-gray-200 rounded-5xl p-8 md:p-16 mb-12 flex flex-col md:flex-row items-center gap-12 shadow-xl">
-             <div className="flex-1 space-y-6">
-              <span className="font-data text-accent text-lg">02.</span>
-              <h3 className="text-4xl md:text-5xl font-bold">We Analyse</h3>
-              <p className="text-lg text-supporting/70 leading-relaxed">
-                Our team processes the data, verifying claims and identifying patterns to separate hype from reality.
-              </p>
-            </div>
-            <div className="flex-1 w-full aspect-square bg-supporting rounded-3xl border border-gray-700 relative overflow-hidden flex items-center justify-center">
-               <Activity className="w-32 h-32 text-accent animate-pulse" />
-               <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
-                 <path d="M0,50 L20,50 L25,20 L35,80 L40,50 L60,50 L65,30 L75,70 L80,50 L100,50" fill="none" stroke="white" strokeWidth="0.5" />
-               </svg>
-            </div>
-          </div>
-
-          {/* Step 3: We Recommend */}
-          <div className="process-card h-[90vh] sticky top-0 bg-primary border border-gray-200 rounded-5xl p-8 md:p-16 mb-12 flex flex-col md:flex-row items-center gap-12 shadow-xl">
-             <div className="flex-1 space-y-6">
-              <span className="font-data text-accent text-lg">03.</span>
-              <h3 className="text-4xl md:text-5xl font-bold">We Recommend</h3>
-              <p className="text-lg text-supporting/70 leading-relaxed">
-                Only products that pass our rigorous "Real Owner" verification earn our badge.
-              </p>
-            </div>
-            <div className="flex-1 w-full aspect-square bg-white rounded-3xl border border-gray-100 relative overflow-hidden flex items-center justify-center">
-              <div className="relative">
-                <div className="w-40 h-40 border-4 border-gray-100 rounded-full" />
-                <div className="absolute inset-0 border-4 border-accent rounded-full border-t-transparent animate-spin" style={{ animationDuration: '3s' }} />
-                <Check className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 text-accent" />
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Category Showcase */}
-      <section className="py-24 px-6 md:px-12 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-12 text-center">Explore Categories</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            
-            <div className="group bg-primary p-8 rounded-4xl border border-gray-100 hover:shadow-lg transition-all cursor-pointer">
-              <h3 className="text-2xl font-bold mb-2">Household</h3>
-              <p className="text-sm text-supporting/60 mb-6">Vacuums, Blenders, Coffee Machines</p>
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
-                <ArrowRight className="w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="group bg-supporting p-8 rounded-4xl border border-gray-800 shadow-xl scale-105 z-10 cursor-pointer">
-              <h3 className="text-2xl font-bold mb-2 text-white">Smart Home</h3>
-              <p className="text-sm text-white/60 mb-6">Security, Lighting, Assistants</p>
-              <button className="bg-accent text-white px-6 py-2 rounded-full text-sm font-medium hover:scale-105 transition-transform">
-                Browse Top Picks
-              </button>
-            </div>
-
-            <div className="group bg-primary p-8 rounded-4xl border border-gray-100 hover:shadow-lg transition-all cursor-pointer">
-              <h3 className="text-2xl font-bold mb-2">Garden</h3>
-              <p className="text-sm text-supporting/60 mb-6">Mowers, Tools, Furniture</p>
-               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
-                <ArrowRight className="w-5 h-5" />
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-supporting text-white py-20 px-6 md:px-12 rounded-t-[3rem] mt-12">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
-          
-          <div className="col-span-1 md:col-span-2 space-y-6">
-            <h2 className="text-2xl font-bold">bestreviews.co.uk</h2>
-            <p className="text-white/60 max-w-sm">
-              The only review site that ignores marketing budgets and listens to real owners.
-            </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-xs font-data uppercase tracking-widest text-white/80">Reviews Updated: Feb 2026</span>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-bold mb-6">Categories</h4>
-            <ul className="space-y-4 text-white/60 text-sm">
-              <li><a href="#" className="hover:text-accent transition-colors">Household Appliances</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Garden & Outdoor</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Smart Home Tech</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Personal Care</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bold mb-6">Company</h4>
-            <ul className="space-y-4 text-white/60 text-sm">
-              <li><a href="#" className="hover:text-accent transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Our Methodology</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Cookie Policy</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-white/10 mt-16 pt-8 text-center md:text-left text-xs text-white/30 font-data">
-          <p>© 2026 BestReviews.co.uk. All rights reserved.</p>
-          <p className="mt-2">
-            Disclosure: We may earn a small commission from links on this site. This never affects our rankings or editorial independence.
+          <p className="mt-6 text-sm text-dark/50 italic border-t border-black/5 pt-4">
+            Real user sentiment on cushion performance.
           </p>
         </div>
-      </footer>
+
+        {/* Card 2: Summary Generator */}
+        <div className="feature-card bg-white p-8 rounded-[2rem] shadow-soft border border-black/5 flex flex-col h-[450px]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-accent/10 rounded-2xl text-accent">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <h3 className="font-heading font-bold text-xl">The Summary Generator</h3>
+          </div>
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 bg-accent/5 text-accent text-[10px] font-bold tracking-widest uppercase rounded-full">
+              <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
+              Analyzing Real Reviews...
+            </div>
+            <TypingSummary />
+          </div>
+          <p className="mt-6 text-sm text-dark/50 italic border-t border-black/5 pt-4">
+            Editor's summary on assembly experience.
+          </p>
+        </div>
+
+        {/* Card 3: Trust Metric */}
+        <div className="feature-card bg-white p-8 rounded-[2rem] shadow-soft border border-black/5 flex flex-col h-[450px]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-primary/10 rounded-2xl text-primary">
+              <BarChart3 className="w-6 h-6" />
+            </div>
+            <h3 className="font-heading font-bold text-xl">The Trust Metric</h3>
+          </div>
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <ScoreGauge score={8.7} />
+            <div className="w-full mt-8 space-y-4">
+              <MetricBar label="UV Resistance" value={92} />
+              <MetricBar label="Surface Heat" value={65} color="bg-accent" />
+            </div>
+          </div>
+          <p className="mt-6 text-sm text-dark/50 italic border-t border-black/5 pt-4">
+            Community consensus on material durability.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const SentimentShuffler = () => {
+  const [index, setIndex] = useState(0);
+  const quotes = [
+    { text: "Loved the water-resistance during the storm.", type: "pos" },
+    { text: "Cushions take forever to dry out after rain.", type: "crit" },
+    { text: "Spilled wine wiped right off, amazing.", type: "pos" },
+    { text: "Drying time is a real pain in humid weather.", type: "crit" },
+    { text: "High quality fabric, feels very durable.", type: "pos" }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % quotes.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="h-full flex flex-col gap-4 py-4">
+      {quotes.map((quote, i) => {
+        const isActive = i === index;
+        const isNext = i === (index + 1) % quotes.length;
+        return (
+          <div 
+            key={i}
+            className={`transition-all duration-1000 absolute w-full p-5 rounded-2xl border ${
+              isActive ? 'opacity-100 translate-y-0 scale-100 z-10' : 
+              isNext ? 'opacity-40 translate-y-16 scale-95 z-0' : 'opacity-0 -translate-y-16'
+            } ${quote.type === 'pos' ? 'bg-primary/5 border-primary/10' : 'bg-accent/5 border-accent/10'}`}
+          >
+            <Quote className={`w-5 h-5 mb-3 ${quote.type === 'pos' ? 'text-primary' : 'text-accent'}`} />
+            <p className={`text-sm font-medium ${quote.type === 'pos' ? 'text-primary' : 'text-accent'}`}>{quote.text}</p>
+          </div>
+        );
+      })}
     </div>
   );
 };
+
+const TypingSummary = () => {
+  const [text, setText] = useState("");
+  const fullText = "The consensus is clear: while the frame is solid, assembly requires two people and a lot of patience. The instructions are famously vague about the final alignment phase. Don't tackle this alone on a Sunday afternoon.";
+  
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setText(fullText.slice(0, i));
+      i++;
+      if (i > fullText.length) clearInterval(interval);
+    }, 30);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <p className="text-lg text-dark/80 leading-relaxed font-medium">
+      {text}<span className="inline-block w-1.5 h-5 bg-accent ml-1 animate-pulse align-middle"></span>
+    </p>
+  );
+};
+
+const ScoreGauge = ({ score }) => {
+  const circleRef = useRef(null);
+  
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(circleRef.current, {
+        strokeDashoffset: 251,
+        duration: 2,
+        ease: 'power2.out',
+        scrollTrigger: circleRef.current
+      });
+    });
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div className="relative flex flex-col items-center">
+      <svg className="w-32 h-32 transform -rotate-90">
+        <circle className="text-black/5" strokeWidth="8" stroke="currentColor" fill="transparent" r="40" cx="64" cy="64" />
+        <circle 
+          ref={circleRef}
+          className="text-primary" 
+          strokeWidth="8" 
+          strokeDasharray="251.2" 
+          strokeDashoffset={251.2 - (251.2 * score) / 10}
+          strokeLinecap="round" 
+          stroke="currentColor" 
+          fill="transparent" 
+          r="40" 
+          cx="64" 
+          cy="64" 
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
+        <span className="text-3xl font-heading font-bold">{score}</span>
+        <span className="text-[10px] uppercase tracking-wider font-bold opacity-40">Score</span>
+      </div>
+      <span className="mt-4 font-heading font-bold text-sm tracking-tight">Community Consensus</span>
+    </div>
+  );
+};
+
+const MetricBar = ({ label, value, color = "bg-primary" }) => {
+  const barRef = useRef(null);
+  useEffect(() => {
+    gsap.from(barRef.current, {
+      width: 0,
+      duration: 1.5,
+      ease: 'power2.out',
+      scrollTrigger: barRef.current
+    });
+  }, []);
+
+  return (
+    <div className="w-full">
+      <div className="flex justify-between text-[11px] font-bold uppercase tracking-wider mb-2 opacity-60">
+        <span>{label}</span>
+        <span>{value}%</span>
+      </div>
+      <div className="w-full h-1.5 bg-black/5 rounded-full overflow-hidden">
+        <div ref={barRef} className={`h-full ${color} rounded-full`} style={{ width: `${value}%` }}></div>
+      </div>
+    </div>
+  );
+};
+
+const Philosophy = () => {
+  const sectionRef = useRef(null);
+  
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const lines = gsap.utils.toArray('.reveal-line');
+      lines.forEach((line) => {
+        gsap.from(line, {
+          scrollTrigger: {
+            trigger: line,
+            start: 'top 85%',
+          },
+          y: 20,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+        });
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section ref={sectionRef} className="bg-primary py-32 relative overflow-hidden">
+      <div className="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none">
+        <img 
+          src="https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&q=80&w=2000" 
+          alt="Texture"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="container mx-auto px-6 relative z-10 text-center max-w-4xl">
+        <p className="reveal-line text-white/60 mb-8 font-medium">Most review sites focus on:</p>
+        <h2 className="reveal-line text-white/40 text-2xl md:text-3xl font-heading mb-16 line-through decoration-white/20">
+          pushing you to buy anything to get a commission.
+        </h2>
+        
+        <p className="reveal-line text-white/60 mb-8 font-medium">We focus on:</p>
+        <h2 className="reveal-line text-white text-4xl md:text-6xl font-heading font-bold leading-tight">
+          what people who <span className="text-accent italic">actually own it</span> have to say.
+        </h2>
+      </div>
+    </section>
+  );
+};
+
+const Protocol = () => {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const panels = gsap.utils.toArray('.protocol-panel');
+      panels.forEach((panel, i) => {
+        if (i === panels.length - 1) return;
+        
+        ScrollTrigger.create({
+          trigger: panel,
+          start: 'top top',
+          pin: true,
+          pinSpacing: false,
+          end: 'bottom top',
+          onUpdate: (self) => {
+            const scale = 1 - (self.progress * 0.05);
+            const blur = self.progress * 4;
+            const opacity = 1 - self.progress;
+            gsap.to(panel, { scale, opacity, filter: `blur(${blur}px)`, duration: 0.1 });
+          }
+        });
+      });
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
+
+  const steps = [
+    {
+      title: "Gathering Raw Truth",
+      desc: "We scrape thousands of threads from Reddit, specialist forums, and verified buyer reviews to get the raw, unfiltered experience.",
+      icon: <Database className="w-8 h-8" />,
+      image: "https://images.unsplash.com/photo-1558222218-b7b54eede3f3?auto=format&fit=crop&q=80&w=1200"
+    },
+    {
+      title: "Filtering the Noise",
+      desc: "Our algorithm identifies and discards bot-generated content, paid shills, and low-effort reviews to leave only genuine owner insights.",
+      icon: <Filter className="w-8 h-8" />,
+      image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1200"
+    },
+    {
+      title: "Extracting the Essence",
+      desc: "An expert editor synthesizes the findings into a plain-English, BS-free summary that tells you exactly what to expect.",
+      icon: <FileText className="w-8 h-8" />,
+      image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=1200"
+    }
+  ];
+
+  return (
+    <div ref={containerRef} className="bg-background">
+      {steps.map((step, i) => (
+        <section key={i} className="protocol-panel min-h-screen flex items-center justify-center p-6 md:p-24 sticky top-0 bg-background border-t border-black/5">
+          <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center max-w-6xl">
+            <div className="order-2 md:order-1">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-heading font-bold text-xl">
+                  {i + 1}
+                </div>
+                <div className="h-px w-12 bg-black/10"></div>
+                <span className="uppercase tracking-[0.2em] font-bold text-xs text-primary">Our Protocol</span>
+              </div>
+              <h2 className="text-4xl md:text-6xl font-heading font-bold mb-8 leading-tight">{step.title}</h2>
+              <p className="text-lg md:text-xl text-dark/60 leading-relaxed mb-10">{step.desc}</p>
+              <div className="p-6 bg-white rounded-3xl shadow-soft border border-black/5 flex items-start gap-5">
+                <div className="text-accent">{step.icon}</div>
+                <div className="text-sm font-medium text-dark/80 italic leading-relaxed">
+                  "This ensures we don't just report what brands want you to hear, but what owners actually experience."
+                </div>
+              </div>
+            </div>
+            <div className="order-1 md:order-2 relative group">
+               <div className="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl">
+                  <img src={step.image} alt={step.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+               </div>
+               <div className="absolute -bottom-8 -right-8 w-48 h-48 bg-accent/10 rounded-full blur-3xl -z-10"></div>
+            </div>
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+};
+
+const TopSummaries = () => {
+  const summaries = [
+    { name: "Nordic Haven Modular Sofa", score: 8.9, desc: "Exceptional UV resistance, but the clip system is tricky for one person.", img: "https://images.unsplash.com/photo-1567016432779-094069958ea5?auto=format&fit=crop&q=80&w=600" },
+    { name: "Sienna Teak Conversation Set", score: 7.4, desc: "Beautiful aging, requires annual oiling that reviewers say is often skipped.", img: "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=600" },
+    { name: "Alu-Core 5-Piece Dining", score: 9.2, desc: "Unbeatable durability; owners report it looks new after 3 winters.", img: "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?auto=format&fit=crop&q=80&w=600" }
+  ];
+
+  return (
+    <section className="py-32 container mx-auto px-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+        <div className="max-w-xl">
+          <h2 className="text-4xl font-heading font-bold mb-4">Trending Summaries</h2>
+          <p className="text-dark/60">The most discussed all-season pieces this month, analyzed for you.</p>
+        </div>
+        <button className="flex items-center gap-2 font-bold text-primary group">
+          View all 142 summaries <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        {summaries.map((s, i) => (
+          <div key={i} className="group cursor-pointer">
+            <div className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden mb-6 shadow-soft transition-all duration-500 group-hover:shadow-2xl">
+              <img src={s.img} alt={s.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <div className="absolute top-6 right-6 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-xl text-xs font-bold shadow-sm">
+                Score: {s.score}
+              </div>
+            </div>
+            <h3 className="text-2xl font-heading font-bold mb-3 group-hover:text-accent transition-colors">{s.name}</h3>
+            <p className="text-dark/60 text-sm leading-relaxed mb-6">{s.desc}</p>
+            <button className="w-full py-4 rounded-2xl border border-black/10 font-bold text-sm hover:bg-black hover:text-white transition-all duration-300">
+              Read what people say about the product
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const Footer = () => {
+  return (
+    <footer className="bg-dark text-white pt-24 pb-12 rounded-t-[4rem] px-6">
+      <div className="container mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
+          <div className="col-span-1 md:col-span-2">
+            <div className="font-heading font-bold text-3xl tracking-tighter mb-6">
+              BestReviews<span className="text-accent">.co.uk</span>
+            </div>
+            <p className="text-white/50 text-lg max-w-md mb-10 leading-relaxed">
+              Real conversations, summarized. We cut through the noise so you can make decisions based on reality, not marketing.
+            </p>
+            <div className="inline-flex items-center gap-4 p-5 bg-white/5 border border-white/10 rounded-3xl">
+              <div className="p-3 bg-accent rounded-2xl text-white">
+                <ShieldCheck className="w-8 h-8" />
+              </div>
+              <div>
+                <div className="font-bold text-sm">100% User-Generated</div>
+                <div className="text-xs text-white/40 font-medium">No Sponsored Reviews. Ever.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-heading font-bold mb-8 text-lg">Platform</h4>
+            <ul className="space-y-4 text-white/50 font-medium">
+              <li><a href="#" className="hover:text-accent transition-colors">Home Categories</a></li>
+              <li><a href="#" className="hover:text-accent transition-colors">Garden Essentials</a></li>
+              <li><a href="#" className="hover:text-accent transition-colors">Latest Trends</a></li>
+              <li><a href="#" className="hover:text-accent transition-colors">Submission Portal</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-heading font-bold mb-8 text-lg">Our Process</h4>
+            <ul className="space-y-4 text-white/50 font-medium">
+              <li><a href="#" className="hover:text-accent transition-colors">Review Methodology</a></li>
+              <li><a href="#" className="hover:text-accent transition-colors">Bias Protection</a></li>
+              <li><a href="#" className="hover:text-accent transition-colors">Community Guidelines</a></li>
+              <li><a href="#" className="hover:text-accent transition-colors">Trust Standards</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-sm text-white/30 font-medium">
+          <div>© 2026 BestReviews.co.uk. Built for transparency.</div>
+          <div className="flex gap-10">
+            <a href="#" className="hover:text-white transition-colors">Privacy</a>
+            <a href="#" className="hover:text-white transition-colors">Terms</a>
+            <a href="#" className="hover:text-white transition-colors">Cookies</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+// --- Main App ---
+
+function App() {
+  return (
+    <div className="relative min-h-screen">
+      <div className="noise-overlay" />
+      <Navbar />
+      <main>
+        <Hero />
+        <Features />
+        <Philosophy />
+        <Protocol />
+        <TopSummaries />
+      </main>
+      <Footer />
+    </div>
+  );
+}
 
 export default App;
